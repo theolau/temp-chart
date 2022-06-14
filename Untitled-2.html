@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+
+            const requestOptions = {
+                method: 'GET',
+                headers: { 'accept': 'application/json', }
+            };
+            const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=100&page=1&sparkline=true";
+            fetch(url, requestOptions)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log(data);
+                    var newTable = new google.visualization.DataTable();
+                    newTable.addColumn('number', 'X');
+                    newTable.addColumn('number', 'USD $');
+
+                    for (let i = 0; i < data[0].sparkline_in_7d.price.length; i++) {
+                        newTable.addRows([[i, data[0].sparkline_in_7d.price[i]]]);
+                    }
+                    console.log(newTable);
+
+                    var options = {
+                        title: 'Bitcoin',
+                        legend: { position: 'bottom' }
+                    };
+
+                    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+                    chart.draw(newTable, options);
+
+                })
+                .catch(function (error) {
+                    console.log('error', error);
+                })
+        }
+    </script>
+</head>
+
+<body>
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+</body>
+
+</html>
